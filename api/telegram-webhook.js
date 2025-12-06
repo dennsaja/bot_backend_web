@@ -1,12 +1,15 @@
-let clients = [];
-
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).end();
+  const SECRET = "8559756893:AAGOe1hD_wA4DgIAut1vvzt4bwtC_RW8YAI"; // dari .env
+
+  // Ambil token dari header (atau query)
+  const token = req.headers['x-telegram-bot-token'];
+
+  // Validasi sederhana
+  if (token !== SECRET) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   const update = req.body;
-
   const message = update.message?.text || "";
 
   const payload = {
@@ -15,12 +18,5 @@ export default async function handler(req, res) {
     date: Date.now()
   };
 
-  // Push ke semua client yang terhubung
-  clients.forEach((res) => {
-    res.write(`data: ${JSON.stringify(payload)}\n\n`);
-  });
-
   res.status(200).json({ ok: true });
 }
-
-export { clients };
